@@ -1,0 +1,111 @@
+﻿sintax اموزشي
+
+select * from hm.people
+where family like '%دانشمند%' 
+
+select m.tmp_name ,m.tmp_family ,p.name,p.family,p.employment_code,m.tmp_emp_no
+from hm.lib_members m
+left join hm.people p 
+on trim(from m.tmp_name) = trim(from p.name)
+\
+select author from hm.lib_books
+سرچ باکس نويسنده
+---------------------------------------------
+براي نامبر کردن اعداد اکسل اول بايد روي علامت زرد وقتي ميگيرشون بزني بعد نابريک کني بعد اون بالا بزني نامبر تو باکسه
+و بهتر توي يک نيو اکسل بزاري فايل اديت شدتو 
+--------------------------------------------------
+گزارش درست
+select Concat(v.register_no,'-',b.title)as register,b.title,v.versions,v.cover,v.id
+from hm.lib_book_versions  v 
+inner join hm.lib_books  b
+on v.lb_id=b.id
+inner join hm.lib_borrow_requests r
+on r.lb_id=b.id
+left join hm.lib_borrows br
+on lbv_id=v.id and br.return_date IS NOT NULL
+where r.lb_id=b.id
+
+غلط
+select Concat(v.register_no,'-',b.title)as register,b.title,Concat(b.lc_main,'-',b.lc_subsidary,b.lc_category)as LC,v.versions,v.cover,v.id
+from hm.lib_book_versions  v 
+inner join hm.lib_books  b
+on v.lb_id=b.id
+inner join hm.lib_borrow_requests r
+on r.lb_id=b.id
+left join hm.lib_borrows br
+on lbv_id=v.id
+where  br.return_date IS NOT NULL
+order by v.register_no
+
+ما اينجا ميخواستم از اون جدول فقط اونايي که ريترن ديت ندارن رو بياره نبايد تو ور باشه چون ور بر روي ههمه اجرا ميشه در حالي که آند اون فقط روي اون جدول مياد هميشه هم بايد يک ور اخر داشته باشي
+-------------------------------------------------
+در پايگاه داده اگه دو جدول داشته باشيم که مثلا اي دي هر دو رو بخوايم و با نام جدول سلکت بگيريم بهمون حوابو ميده اما اشتباه ميده چون تشخيص نميده که اين اي دي از دو جدول جداس و جدا بريزشون بلکه تو يکي ميريزه و بهم ميريزه براي اين رفع اين مشکل ازشون يک از ميگيريم يعني يک نام مستعار 
+
+نمونه:
+
+select 	lib.id as bookid,
+        b.id,
+        lib.peo_id,
+		lib.from_date,
+		lib.to_date,
+		lib.holdover_no,
+		lib.holdover_date,
+		lib.return_date,
+		lib.use_id_creator,
+		lib.create_date_time,
+		b.title,
+        bv.register_no,
+        p.name,
+        p.family,
+		CONCAT(b.lc_main,b.lc_subsidary,b.lc_category,b.lc_year)as "Lc"
+		from
+		hm.lib_borrows  lib 
+		inner join hm.lib_book_versions bv
+			on lib.lbv_id=bv.id 
+			        inner join hm.people p
+        on p.id=lib.peo_id
+		INNER JOIN  hm.lib_books  b
+    		ON bv.lb_id= b.id
+         where  p.id=@pe_id
+
+-----------------------------------------------------------------------------------------
+من ميخواستم در مورد امانت دادن اگه از جديد باز بشه فقط سلکت اولي بياد اگه از ليست رزرو باز بشه سلکت دومي اجرا شه اين يونيون اين کارو ميکنه اگه ور هر جدول درست نباشه اونو اجرا نميکنه البته نميشه گفت اجرا نميکنه نياز به تحيلي بيشتر داره اماچيزي که مطعمنم وقتي ريکوعست اي دي خاليه دومي اجرا نميشه 
+
+
+select * from(
+select Concat(b.serial_no,'-',v.register_no,'-',b.title)as register,v.register_no as regi,b.title,Concat(b.lc_main,'-',b.lc_subsidary,b.lc_category)as LC,v.versions,v.cover,v.id
+from hm.lib_book_versions  v 
+inner join hm.lib_books  b
+on v.lb_id=b.id
+where v.id not in (select lbv_id from hm.lib_borrows where return_date is null)
+UNION
+select Concat(b.serial_no,'-',v.register_no,'-',b.title)as register,v.register_no as regi,b.title,Concat(b.lc_main,'-',b.lc_subsidary,b.lc_category)as LC,v.versions,v.cover,v.id
+from hm.lib_book_versions  v 
+inner join hm.lib_books  b
+on v.lb_id=b.id
+inner join hm.lib_borrow_requests r
+on b.id=r.lb_id where r.id=@request_id
+	) as t
+order by regi ASC
+-------
+دلت کرد ن با اینر جویین
+delete from hm.lib_borrows br using hm.lib_book_versions v  where  br.lbv_id = v.id and v.lb_id=67664
+--------
+cannot read propertes of null
+زمانی پیش میاد که بخوای از یک ابزکت یا شی یک مقداری رو با نام کلیدش بکشی بیرون در اون صورت بهت میگه نمی تونه از ابجکتی که توش پوچه چیزی که میخوای رو بکشی بیرون
+
+
+
+
+
+-----------------------------
+ريختن افراد موجود در افراد در کتاب خانه 
+INSERT INTO hm.lib_members (peo_id) 
+select p.id from hm.lib_members m
+inner join hm.people p 
+on p.id=m.tmp_emp_no
+where m.tmp_emp_no=p.id
+
+پاک کردن افراد دوم
+delete  from hm.lib_members where tmp_emp_no in(select peo_id from hm.lib_members)
+
