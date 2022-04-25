@@ -1,0 +1,259 @@
+﻿sintax اموزشي
+
+select * from hm.people
+where family like '%دانشمند%' 
+
+select m.tmp_name ,m.tmp_family ,p.name,p.family,p.employment_code,m.tmp_emp_no
+from hm.lib_members m
+left join hm.people p 
+on trim(from m.tmp_name) = trim(from p.name)
+\
+select author from hm.lib_books
+سرچ باکس نويسنده
+---------------------------------------------
+براي نامبر کردن اعداد اکسل اول بايد روي علامت زرد وقتي ميگيرشون بزني بعد نابريک کني بعد اون بالا بزني نامبر تو باکسه
+و بهتر توي يک نيو اکسل بزاري فايل اديت شدتو 
+--------------------------------------------------
+گزارش درست
+select Concat(v.register_no,'-',b.title)as register,b.title,v.versions,v.cover,v.id
+from hm.lib_book_versions  v 
+inner join hm.lib_books  b
+on v.lb_id=b.id
+inner join hm.lib_borrow_requests r
+on r.lb_id=b.id
+left join hm.lib_borrows br
+on lbv_id=v.id and br.return_date IS NOT NULL
+where r.lb_id=b.id
+
+غلط
+select Concat(v.register_no,'-',b.title)as register,b.title,Concat(b.lc_main,'-',b.lc_subsidary,b.lc_category)as LC,v.versions,v.cover,v.id
+from hm.lib_book_versions  v 
+inner join hm.lib_books  b
+------------------------------------------------------------------------------
+در مورد ای دی ایکس بود میخواستم بدونم چند تا فرزند هست  که با نقطه مشخص میشد که در سلکت اول اومدم نقطه ها رو گرفتم بعد برای این که تعدادا این که چند تا فرزند و پدر داریم رو در بیارم اومدم توی یک سلکت بزرگتر گذاشتم که گروه بندی میشد رو ام ایکس
+SELECT 
+LENGTH(idx) - LENGTH(REPLACE(idx, '.', '')) + 1 as mx,
+count(idx) as cs
+FROM eq.equipments
+group by idx
+order by mx desc
+	)as s
+	group by mx
+	order by mx desc
+
+
+---------------------------------
+بهترین فاکشن برای جاگزین کردن حرف های خاص
+replace([DESCRIPTION],char(39),char(96))
+on v.lb_id=b.id
+inner join hm.lib_borrow_requests r
+on r.lb_id=b.id
+left join hm.lib_borrows br
+on lbv_id=v.id
+where  br.return_date IS NOT NULL
+order by v.register_no
+
+ما اينجا ميخواستم از اون جدول فقط اونايي که ريترن ديت ندارن رو بياره نبايد تو ور باشه چون ور بر روي ههمه اجرا ميشه در حالي که آند اون فقط روي اون جدول مياد هميشه هم بايد يک ور اخر داشته باشي
+-------------------------------------------------
+در پايگاه داده اگه دو جدول داشته باشيم که مثلا اي دي هر دو رو بخوايم و با نام جدول سلکت بگيريم بهمون حوابو ميده اما اشتباه ميده چون تشخيص نميده که اين اي دي از دو جدول جداس و جدا بريزشون بلکه تو يکي ميريزه و بهم ميريزه براي اين رفع اين مشکل ازشون يک از ميگيريم يعني يک نام مستعار 
+
+نمونه:
+
+select 	lib.id as bookid,
+        b.id,
+        lib.peo_id,
+		lib.from_date,
+		lib.to_date,
+		lib.holdover_no,
+		lib.holdover_date,
+		lib.return_date,
+		lib.use_id_creator,
+		lib.create_date_time,
+		b.title,
+        bv.register_no,
+        p.name,
+        p.family,
+		CONCAT(b.lc_main,b.lc_subsidary,b.lc_category,b.lc_year)as "Lc"
+		from
+		hm.lib_borrows  lib 
+		inner join hm.lib_book_versions bv
+			on lib.lbv_id=bv.id 
+			        inner join hm.people p
+        on p.id=lib.peo_id
+		INNER JOIN  hm.lib_books  b
+    		ON bv.lb_id= b.id
+         where  p.id=@pe_id
+
+-----------------------------------------------------------------------------------------
+من ميخواستم در مورد امانت دادن اگه از جديد باز بشه فقط سلکت اولي بياد اگه از ليست رزرو باز بشه سلکت دومي اجرا شه اين يونيون اين کارو ميکنه اگه ور هر جدول درست نباشه اونو اجرا نميکنه البته نميشه گفت اجرا نميکنه نياز به تحيلي بيشتر داره اماچيزي که مطعمنم وقتي ريکوعست اي دي خاليه دومي اجرا نميشه 
+
+
+select * from(
+select Concat(b.serial_no,'-',v.register_no,'-',b.title)as register,v.register_no as regi,b.title,Concat(b.lc_main,'-',b.lc_subsidary,b.lc_category)as LC,v.versions,v.cover,v.id
+from hm.lib_book_versions  v 
+inner join hm.lib_books  b
+on v.lb_id=b.id
+where v.id not in (select lbv_id from hm.lib_borrows where return_date is null)
+UNION
+select Concat(b.serial_no,'-',v.register_no,'-',b.title)as register,v.register_no as regi,b.title,Concat(b.lc_main,'-',b.lc_subsidary,b.lc_category)as LC,v.versions,v.cover,v.id
+from hm.lib_book_versions  v 
+inner join hm.lib_books  b
+on v.lb_id=b.id
+inner join hm.lib_borrow_requests r
+on b.id=r.lb_id where r.id=@request_id
+	) as t
+order by regi ASC
+-------
+دلت کرد ن با اینر جویین
+delete from hm.lib_borrows br using hm.lib_book_versions v  where  br.lbv_id = v.id and v.lb_id=67664
+--------
+cannot read propertes of null
+زمانی پیش میاد که بخوای از یک ابزکت یا شی یک مقداری رو با نام کلیدش بکشی بیرون در اون صورت بهت میگه نمی تونه از ابجکتی که توش پوچه چیزی که میخوای رو بکشی بیرون
+
+
+
+
+
+-----------------------------
+ريختن افراد موجود در افراد در کتاب خانه 
+INSERT INTO hm.lib_members (peo_id) 
+select p.id from hm.lib_members m
+inner join hm.people p 
+on p.id=m.tmp_emp_no
+where m.tmp_emp_no=p.id
+
+پاک کردن افراد دوم
+delete  from hm.lib_members where tmp_emp_no in(select peo_id from hm.lib_members)
+--------------------------
+مییومد از رکورد های ای دی تکراری  کوچیک ترینشو پاک میکرد
+delete from  hm.lib_borrows where id in(
+select min(id) 
+from hm.lib_borrows
+where return_date is null
+group by temp_person_id,temp_madrak_id,from_date
+having count(*)>1)
+			
+-----------------------------
+اموزشی سکلت تکراری یک به چند در اینر جوین ها باید انحام بشه به عبارتی رعایت بشه در وی اس ما یک کتاب به چندین کتاب .صل کردیم ااصلاح وی قبلی
+
+ select 
+concat(coalesce(p.name,m.g_name),' ',coalesce(p.family,m.g_family)) ,
+b.title , v.register_no,string_agg(cast(vs.register_no as varchar),',')
+from hm.lib_borrows br
+inner join hm.lib_book_versions v
+on br.lbv_id=v.id
+inner join hm.lib_books b
+on v.lb_id=b.id
+left join hm.people as p
+	on br.peo_id=p.id
+left join hm.lib_members m
+on br.lm_id=m.id
+join hm.lib_book_versions vs on b.id=vs.lb_id
+where return_date is null --and v.register_no=11080
+group by p.name,m.g_name,p.family,m.g_family,v.register_no,b.title
+having count(*)>1  
+
+
+----------------
+کارش عین ریپلسی میگرده تو سلول ا.نی که گفتی رو تغییر میده نه همه سلول ر و
+update cm.users set expire_date=replace(expire_date,'/','') 
+
+----------------
+تغییر رشته به عدد
+ALTER TABLE cm.users
+ALTER COLUMN expire_date TYPE int
+USING expire_date::integer;
+
+-----------
+نکته مهم در کوبو باکس اگه سلکتت نامبر باشه صفر ها رو فاقد عنوان میاره اگه رشته شه باشه مشکل حرفه
+
+---------------
+جالب ترین سینتکس برای در اوردن فرزند های یک پدر که به صورت لول مانند میاره
+ with RECURSIVE  level1 as(
+ select id,equ_id,title,1 as level from eq.equipments where idx='1'
+ UNION ALL
+ select eq.id,eq.equ_id,eq.title,level1.level+1 
+	 from  eq.equipments eq,level1 
+	 where eq.equ_id=level1.id
+ 	and level1.level<2
+ )
+ select * from level1 
+-------------------------------
+اپدیت همه ای دی ایکس ها
+
+update eq.equipments eq  set idx= concat(eqi.idx,'.',eq.id) 
+from  eq.equipments eqi
+where eq.equ_id=eqi.id and eq.idx is  null and eqi.idx is not null
+
+-----------------------------------
+BFS 
+
+BFS “is an algorithm for traversing or searching tree data structure. It starts at the tree root and explores the neighbor nodes first, before moving to the next level neighbors
+الگوریتمی برای پیمایش یا جستجوی ساختار داده درختی است. از ریشه درخت شروع می شود و ابتدا گره های همسایه را بررسی می کند، قبل از اینکه به همسایه های سطح بعدی منتقل شود
+
+DFS 
+DFS “is an algorithm for traversing or searching tree data structure. One starts at the root and explores as far as possible along each branch before backtracking.”
+الگوریتمی برای پیمایش یا جستجوی ساختار داده درختی است. یکی از ریشه شروع می کند و قبل از عقب نشینی، تا آنجا که ممکن است در امتداد هر شاخه کاوش می کند.
+
+-------------------------
+کاموندا
+
+تمام تسک ها باید  تایپ   آن ها مشخص باشد به عبارتی روی اچار زده شده و میگی که کدوم نوع تسک هست
+تمام تسک ها باید نام ایدی موجود در دیتابیس را داشته باشن و همه دارای فرم باشن
+تمام تسک ها باید  
+
+--------------------------------------
+اگر به جای کانکت ، کانکت کوالکس بزاری به عبارتی برعکس شه جاهاشون، چون کانکت رشته خالیه و هیچ وقت نال نمیشه همیشه عبارت خالی رو برمیگردونه 
+select m.id,
+concat(coalesce(p.name,m.g_name),' ',coalesce(p.family,m.g_family)) as person
+,count(lbv_id) as countborrows,coalesce(p.employment_code,m.g_member_no)as member_no
+from hm.lib_borrows br
+inner join hm.lib_members m
+on br.lm_id= m.id
+left join hm.people p 
+on m.peo_id=p.id
+where br.from_date>= 14010101 and br.to_date<=14010131
+group by m.id,br.peo_id,p.name,p.family,m.tmp_emp_no,p.employment_code,m.g_name,m.g_family,m.g_member_no
+order by count(lbv_id) desc
+
+
+select concat(g_name,' ',g_family) from hm.lib_members where  id=4351
+
+
+
+-----------------------------------------
+گزارش هایی که با چک باکس تولید میشن داستانشون اینه مقدار چک باتکس مساوی میشه با ترو
+select b.serial_no,
+       bv.register_no,
+        b.title,
+        coalesce(concat(p.name,' ',p.family),concat(m.g_name,' ',m.g_family)) as person,
+		lib.from_date,
+		lib.to_date,
+		lib.holdover_date,
+		coalesce(p.mobile,m.g_mobile) as mobile,
+		concat(b.lc_year,' - ',b.lc_category,' - ',b.lc_subsidary,' - ',b.lc_main) as "lc"
+		from
+		hm.lib_borrows  lib 
+		inner join hm.lib_book_versions bv
+			on lib.lbv_id=bv.id 
+			        inner join hm.lib_members m
+        on m.id=lib.lm_id
+        left join hm.people p
+        on m.peo_id=p.id
+		inner join  hm.lib_books  b
+    		on bv.lb_id= b.id
+        where lib.from_date>= 14000627 and lib.to_date<= 14010128
+		and (cm.currentdate()>to_date and coalesce(holdover_date,0)<cm.currentdate() and true=true ) or (cm.currentdate()<to_date and null=true) 
+		and return_date is null
+        order by lib.from_date desc
+
+
+
+-----------------------------
+این و نات این باید عدد باشه اینجا چون نال داشتیم و نال عدد نبود کلا هیچی نمی اورد 
+select b.serial_no,b.title,CONCAT(b.lc_year,' - ',b.lc_category,' - ',b.lc_subsidary,' - ',b.lc_main) as LC
+from hm.lib_book_versions  v 
+inner join hm.lib_books  b
+on v.lb_id=b.id
+where v.id 
+not in (select distinct coalesce(lbv_id,-1)  from hm.lib_borrows )
